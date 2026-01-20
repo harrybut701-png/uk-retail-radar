@@ -9,8 +9,9 @@ This project automatically scrapes "New In" sections of major UK supermarkets we
 - ASDA
 - Ocado
 - M&S Food
-- Aldi (Specialbuys)
-- Lidl (Leaflets)
+- Boots
+- Holland & Barrett
+- Waitrose
 
 *Note: Currently, Sainsbury's includes a concrete scraper implementation. Others use a generic placeholder that requires implementing specific selectors.*
 
