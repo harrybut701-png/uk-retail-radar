@@ -23,9 +23,8 @@ async function runAutomatedRadar() {
 
     console.log('🚀 Starting Automated Retail Radar...');
 
-    // We can select a subset of phrases to avoid hitting rate limits too fast, 
-    // or just run them all if we have a high-tier key.
-    const phrasesToUse = TRIGGER_PHRASES.slice(0, 5); // Starting with a small batch
+    // Use a larger slice of phrases to ensure we find something new in tests
+    const phrasesToUse = TRIGGER_PHRASES.slice(0, 15);
 
     let allNewProducts: any[] = [];
 
