@@ -1,0 +1,45 @@
+
+export const RETAILERS = [
+    "Holland and Barrett",
+    "Boots",
+    "Sainsbury's",
+    "Ocado",
+    "Tesco",
+    "Waitrose",
+    "Asda",
+    "Morrisons"
+];
+
+export const TRIGGER_PHRASES = [
+    "new in",
+    "now available",
+    "just launched",
+    "launching today",
+    "just landed",
+    "now stocked",
+    "on shelves",
+    "in stores now",
+    "available in store",
+    "listed with",
+    "range launch",
+    "exclusive to",
+    "we’re excited to announce",
+    "thrilled to share",
+    "proud to announce",
+    "big news",
+    "huge milestone",
+    "excited to share that",
+    "delighted to announce",
+    "now available at",
+    "listed in",
+    "rolling out to",
+    "nationwide rollout",
+    "available online at",
+    "available in-store and online",
+    "coming soon to",
+    "landing soon",
+    "preparing for launch",
+    "next up:",
+    "first retail partner",
+    "soft launch"
+];

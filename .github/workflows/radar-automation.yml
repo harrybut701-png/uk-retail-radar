@@ -1,0 +1,64 @@
+name: Weekly Automated LinkedIn Radar
+
+on:
+  schedule:
+    # Runs at 08:00 UTC every Monday
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  radar-sweep:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # Needed to commit the updated CSV back
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Automated Radar
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+        run: npm run radar
+
+      - name: Post Summary to GitHub Actions
+        if: always()
+        run: |
+          if [ -f last-run-summary.md ]; then
+            cat last-run-summary.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No new products found this week." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Send Email Notification
+        if: success() && hashFiles('last-run-summary.md') != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SERVER }}
+          server_port: ${{ secrets.EMAIL_PORT }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚀 Weekly Retail Radar: New Launches Found!"
+          to: ${{ secrets.EMAIL_TO }}
+          from: "Retail Radar <${{ secrets.EMAIL_USERNAME }}>"
+          html_body: file://last-run-summary.md
+          convert_markdown: true
+
+      - name: Commit and Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/linkedin_launches.csv
+          git commit -m "Automated LinkedIn Radar update: $(date +'%Y-%m-%d')" || echo "No new launches found to commit"
+          git push

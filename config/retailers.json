@@ -1,0 +1,37 @@
+[
+    {
+        "name": "Tesco",
+        "startUrl": "https://www.tesco.com/groceries/en-GB/zone/new-ranges",
+        "type": "tesco"
+    },
+    {
+        "name": "Sainsburys",
+        "startUrl": "https://www.sainsburys.co.uk/gol-ui/features/new-in",
+        "type": "sainsburys"
+    },
+    {
+        "name": "ASDA",
+        "startUrl": "https://www.asda.com/groceries/event/new",
+        "type": "asda"
+    },
+    {
+        "name": "Ocado",
+        "startUrl": "https://www.ocado.com/categories/new-trending/new/9c727c0b-e6d8-4e07-b6d9-5126e8c9ef9d",
+        "type": "ocado"
+    },
+    {
+        "name": "M&S Food",
+        "startUrl": "https://www.marksandspencer.com/food/l/new-in",
+        "type": "mands"
+    },
+    {
+        "name": "Aldi",
+        "startUrl": "https://www.aldi.co.uk/specialbuys",
+        "type": "aldi"
+    },
+    {
+        "name": "Lidl",
+        "startUrl": "https://www.lidl.co.uk/c/online-leaflets/s10023175",
+        "type": "lidl"
+    }
+]

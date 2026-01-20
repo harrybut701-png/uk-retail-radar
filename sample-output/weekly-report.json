@@ -1,0 +1,50 @@
+[
+    {
+        "retailer": "Tesco",
+        "added": [
+            {
+                "retailer": "Tesco",
+                "scrapedAt": "2026-01-17T10:00:00Z",
+                "id": "12345",
+                "name": "Tesco Finest Chocolate Cake",
+                "brand": "Tesco Finest",
+                "price": 4.5,
+                "productUrl": "https://tesco.com/...",
+                "sourceType": "html"
+            },
+            {
+                "retailer": "Tesco",
+                "scrapedAt": "2026-01-17T10:00:00Z",
+                "id": "67890",
+                "name": "New Spicy Pizza",
+                "brand": "Tesco",
+                "price": 3.0,
+                "productUrl": "https://tesco.com/...",
+                "sourceType": "html"
+            }
+        ],
+        "removed": [],
+        "changed": []
+    },
+    {
+        "retailer": "Sainsburys",
+        "added": [],
+        "removed": [],
+        "changed": [
+            {
+                "product": {
+                    "retailer": "Sainsburys",
+                    "scrapedAt": "2026-01-17T10:00:00Z",
+                    "id": "abcde",
+                    "name": "Kellogg's Cornflakes",
+                    "price": 3.0,
+                    "productUrl": "https://sainsburys.co.uk/...",
+                    "sourceType": "html"
+                },
+                "changes": [
+                    "Price: 2.50 -> 3.00"
+                ]
+            }
+        ]
+    }
+]
