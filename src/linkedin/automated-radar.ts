@@ -72,7 +72,7 @@ async function runAutomatedRadar() {
                     // DEBUG: Log the input being sent to the LLM
                     console.log(`[DEBUG] Sending ${combinedText.length} chars to LLM. Preview: ${combinedText.substring(0, 200)}...`);
 
-                    const extraction = await extractor.extractFromText(combinedText);
+                    const extraction = await extractor.extractFromText(combinedText, retailer);
 
                     console.log(`[DEBUG] Extraction result for ${retailer}: ${extraction.products.length} products found.`);
 

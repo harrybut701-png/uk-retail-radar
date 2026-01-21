@@ -15,8 +15,14 @@ export class LinkedInExtractorService {
         });
     }
 
-    async extractFromText(postText: string): Promise<ExtractionResult> {
-        const prompt = `${LINKEDIN_EXTRACTION_SYSTEM_PROMPT}\n\nUSER INSTRUCTION: You must extract EVERY product that even remotely looks like a new listing. Do not filter for "official" launches. If in doubt, extract it with confidence 'Low'.\n\nPost text:\n"""${postText}"""`;
+    async extractFromText(postText: string, contextRetailer?: string): Promise<ExtractionResult> {
+        let specializedPrompt = LINKEDIN_EXTRACTION_SYSTEM_PROMPT;
+
+        if (contextRetailer) {
+            specializedPrompt += `\n\nCONTEXT: This text was found in a search specifically for "${contextRetailer}". IF a product is mentioned, ASSUME the retailer is "${contextRetailer}" unless the text explicitly says otherwise (e.g. "Available at Asda" when context is Tesco).`;
+        }
+
+        const prompt = `${specializedPrompt}\n\nUSER INSTRUCTION: You must extract EVERY product that even remotely looks like a new listing. Do not filter for "official" launches. If in doubt, extract it with confidence 'Low'.\n\nPost text:\n"""${postText}"""`;
 
         const result = await this.model.generateContent(prompt);
         const response = await result.response;
