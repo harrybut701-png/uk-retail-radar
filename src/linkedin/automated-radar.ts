@@ -139,4 +139,7 @@ async function runAutomatedRadar() {
     console.log('\n✅ Automated Radar Sweep Complete!');
 }
 
-runAutomatedRadar().catch(console.error);
+runAutomatedRadar().catch(err => {
+    console.error("FATAL ERROR IN RADAR:", err);
+    process.exit(1);
+});
