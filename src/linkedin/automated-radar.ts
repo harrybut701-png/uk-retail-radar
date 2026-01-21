@@ -40,7 +40,7 @@ async function runAutomatedRadar() {
         for (const scope of SEARCH_SCOPES) {
             console.log(`\n[Scanning ${scope.type}]`);
 
-            const chunkSize = 6;
+            const chunkSize = 4;
             for (let i = 0; i < phrasesToUse.length; i += chunkSize) {
                 const chunk = phrasesToUse.slice(i, i + chunkSize);
                 // Construct query with OR operators for the batch
@@ -50,11 +50,12 @@ async function runAutomatedRadar() {
                 const query = `"${retailer}" ("${groupedPhrases}")`;
                 console.log(`Searching: ${query}...`);
 
-                // Search deeper (20 results) and further back (1 month)
+                // Search WITHOUT date restriction first to ensure we get results
+                // We rely on the LLM to filter out truly old stuff
                 const searchResults = await searchService.searchLinkedIn(
                     query,
                     20,         // Increase results per page
-                    'qdr:m',    // Look back 1 month (compatible with Serper)
+                    undefined,  // REMOVED TIME FILTER (was 'qdr:m') - Let Google return best matches
                     scope.filter // Toggle between posts and articles
                 );
 
