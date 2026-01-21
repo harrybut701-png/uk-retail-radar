@@ -23,53 +23,72 @@ async function runAutomatedRadar() {
 
     console.log('🚀 Starting Automated Retail Radar...');
 
-    // Use a larger slice of phrases to ensure we find something new in tests
-    const phrasesToUse = TRIGGER_PHRASES.slice(0, 15);
+    // FULL SEARCH MODE: Use all available phrases for maximum coverage
+    const phrasesToUse = TRIGGER_PHRASES;
+
+    // Define search scopes to catch both short posts and long-form articles
+    const SEARCH_SCOPES = [
+        { type: 'Posts', filter: 'site:linkedin.com/posts' },
+        { type: 'Articles', filter: 'site:linkedin.com/pulse' }
+    ];
 
     let allNewProducts: any[] = [];
 
     for (const retailer of RETAILERS) {
         console.log(`\n--- Researching ${retailer} ---`);
 
-        for (const phrase of phrasesToUse) {
-            const query = `"${retailer}" "${phrase}"`;
-            console.log(`Searching: ${query}...`);
+        for (const scope of SEARCH_SCOPES) {
+            console.log(`\n[Scanning ${scope.type}]`);
 
-            const searchResults = await searchService.searchLinkedIn(query, 10);
+            const chunkSize = 6;
+            for (let i = 0; i < phrasesToUse.length; i += chunkSize) {
+                const chunk = phrasesToUse.slice(i, i + chunkSize);
+                // Construct query with OR operators for the batch
+                const groupedPhrases = chunk.join('" OR "');
 
-            if (searchResults.length === 0) {
-                console.log(`No results found for "${query}"`);
-                continue;
-            }
+                // The site filter is handled by the search service, just provide the content query
+                const query = `"${retailer}" ("${groupedPhrases}")`;
+                console.log(`Searching: ${query}...`);
 
-            // Combine snippets for batch extraction to save on LLM calls
-            const combinedText = searchResults.map(r =>
-                `SOURCE: ${r.link}\nDATE: ${r.date || 'unknown'}\nSNIPPET: ${r.snippet}\n---`
-            ).join('\n');
+                // Search deeper (20 results) and further back (3 months)
+                const searchResults = await searchService.searchLinkedIn(
+                    query,
+                    20,         // Increase results per page
+                    'qdr:m3',   // Look back 3 months
+                    scope.filter // Toggle between posts and articles
+                );
 
-            try {
-                const extraction = await extractor.extractFromText(combinedText);
-
-                if (extraction.products.length > 0) {
-                    console.log(`✅ Found ${extraction.products.length} new products!`);
-
-                    // Filter out duplicates before capturing for the summary
-                    // We need to slightly adjust how we capture these for the summary
-                    // For now, let's just collect all found and let the exporter handle CSV dedupe
-                    extraction.products.forEach(p => {
-                        allNewProducts.push({ ...p, retailer: extraction.retailer });
-                    });
-
-                    await exporter.appendExtraction(extraction, `AutoSearch: ${query}`);
-                } else {
-                    console.log('No new products detected in these results.');
+                if (searchResults.length === 0) {
+                    console.log(`No results found for batch.`);
+                    continue;
                 }
-            } catch (error) {
-                console.error(`Extraction failed for ${query}:`, error);
-            }
 
-            // Small delay to be polite to APIs
-            await new Promise(resolve => setTimeout(resolve, 2000));
+                // Combine snippets for batch extraction to save on LLM calls
+                const combinedText = searchResults.map(r =>
+                    `SOURCE: ${r.link}\nDATE: ${r.date || 'unknown'}\nSNIPPET: ${r.snippet}\n---`
+                ).join('\n');
+
+                try {
+                    const extraction = await extractor.extractFromText(combinedText);
+
+                    if (extraction.products.length > 0) {
+                        console.log(`✅ Found ${extraction.products.length} new products!`);
+
+                        extraction.products.forEach(p => {
+                            allNewProducts.push({ ...p, retailer: extraction.retailer });
+                        });
+
+                        await exporter.appendExtraction(extraction, `AutoSearch (${scope.type}): ${query}`);
+                    } else {
+                        console.log('No new products detected in these results.');
+                    }
+                } catch (error) {
+                    console.error(`Extraction failed for ${query}:`, error);
+                }
+
+                // Small delay to be polite to APIs
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
         }
     }
 

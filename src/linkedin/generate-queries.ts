@@ -17,10 +17,14 @@ async function main() {
     console.log(`Searching for posts after: ${dateStr} (12 weeks ago)\n`);
 
     for (const retailer of RETAILERS) {
-        // We group phrases to make search more efficient
-        const groupedPhrases = TRIGGER_PHRASES.join('" OR "');
-        const query = `site:linkedin.com/posts "${retailer}" ("${groupedPhrases}") after:${dateStr}`;
-        queries.push(query);
+        // Batch phrases to avoid query length limits
+        const chunkSize = 6;
+        for (let i = 0; i < TRIGGER_PHRASES.length; i += chunkSize) {
+            const chunk = TRIGGER_PHRASES.slice(i, i + chunkSize);
+            const groupedPhrases = chunk.join('" OR "');
+            const query = `site:linkedin.com/posts "${retailer}" ("${groupedPhrases}") after:${dateStr}`;
+            queries.push(query);
+        }
     }
 
     const outputPath = path.join(process.cwd(), 'sweep_queries.txt');
