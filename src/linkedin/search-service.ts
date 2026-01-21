@@ -20,7 +20,7 @@ export class GoogleSearchService {
      * @param query The search query string
      * @param numResults Number of results to return (up to 100)
      */
-    async searchLinkedIn(query: string, numResults: number = 50, timeRange: string = 'qdr:m3', siteFilter: string = 'site:linkedin.com/posts'): Promise<SearchResultSnippet[]> {
+    async searchLinkedIn(query: string, numResults: number = 50, timeRange: string = 'qdr:m', siteFilter: string = 'site:linkedin.com/posts'): Promise<SearchResultSnippet[]> {
         // Construct query with specific site filter
         const fullQuery = `${siteFilter} ${query}`;
 
@@ -28,7 +28,7 @@ export class GoogleSearchService {
             const response = await axios.post('https://google.serper.dev/search', {
                 q: fullQuery,
                 num: numResults,
-                tbs: timeRange // Default to last 3 months for broader catch
+                tbs: timeRange // Default to last month
             }, {
                 headers: {
                     'X-API-KEY': this.apiKey,
@@ -43,8 +43,8 @@ export class GoogleSearchService {
                 snippet: r.snippet,
                 date: r.date
             }));
-        } catch (error) {
-            console.error(`Search failed for query "${query}":`, error);
+        } catch (error: any) {
+            console.error(`Search failed for query "${query}":`, error.response?.data || error.message);
             return [];
         }
     }

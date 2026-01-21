@@ -50,11 +50,11 @@ async function runAutomatedRadar() {
                 const query = `"${retailer}" ("${groupedPhrases}")`;
                 console.log(`Searching: ${query}...`);
 
-                // Search deeper (20 results) and further back (3 months)
+                // Search deeper (20 results) and further back (1 month)
                 const searchResults = await searchService.searchLinkedIn(
                     query,
                     20,         // Increase results per page
-                    'qdr:m3',   // Look back 3 months
+                    'qdr:m',    // Look back 1 month (compatible with Serper)
                     scope.filter // Toggle between posts and articles
                 );
 
