@@ -34,8 +34,12 @@ async function runAutomatedRadar() {
 
     let allNewProducts: any[] = [];
 
+    const debugLogPath = './debug_log.txt';
+    await fs.writeFile(debugLogPath, `DEBUG LOG START: ${new Date().toISOString()}\n\n`);
+
     for (const retailer of RETAILERS) {
         console.log(`\n--- Researching ${retailer} ---`);
+        let isFirstBatch = true; // Flag to log only the first batch per retailer to avoid huge files
 
         for (const scope of SEARCH_SCOPES) {
             console.log(`\n[Scanning ${scope.type}]`);
@@ -77,6 +81,13 @@ async function runAutomatedRadar() {
 
                     const extraction = await extractor.extractFromText(combinedText, retailer);
 
+                    // LOGGING RAW INTERACTION
+                    if (isFirstBatch) {
+                        const logEntry = `\n\n--- RETAILER: ${retailer} ---\nINPUT TEXT:\n${combinedText}\n\nLLM OUTPUT:\n${JSON.stringify(extraction, null, 2)}\n--------------------------\n`;
+                        await fs.appendFile(debugLogPath, logEntry);
+                        isFirstBatch = false;
+                    }
+
                     console.log(`[DEBUG] Extraction result for ${retailer}: ${extraction.products.length} products found.`);
 
                     if (extraction.products.length > 0) {
@@ -93,14 +104,17 @@ async function runAutomatedRadar() {
                 } catch (error: any) {
                     console.error(`❌ CRITICAL FAILURE for query "${query}":`);
                     console.error(error);
+
+                    await fs.appendFile(debugLogPath, `\nERROR for ${query}: ${error.message}\n`);
+
                     // If it's an API key or Model issue, we should stop everything, not just continue
                     if (error.status === 403 || error.status === 404 || error.message?.includes("API key")) {
                         throw new Error(`Stopping Radar: Critical API Error - ${error.message}`);
                     }
                 }
 
-                // Small delay to be polite to APIs
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Long delay to respect API rate limits (10s)
+                await new Promise(resolve => setTimeout(resolve, 10000));
             }
         }
     }
@@ -117,8 +131,11 @@ async function runAutomatedRadar() {
 
         await fs.writeFile('./last-run-summary.md', summaryMd);
         console.log('\n📄 Summary report generated: last-run-summary.md');
+    } else {
+        console.log('\n⚠️ No new products found. No summary report generated.');
     }
 
+    console.log(`\n📄 Debug Log saved to ${debugLogPath}`);
     console.log('\n✅ Automated Radar Sweep Complete!');
 }
 
