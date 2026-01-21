@@ -90,8 +90,13 @@ async function runAutomatedRadar() {
                     } else {
                         console.log('No new products detected in these results (filtered by LLM).');
                     }
-                } catch (error) {
-                    console.error(`Extraction failed for ${query}:`, error);
+                } catch (error: any) {
+                    console.error(`❌ CRITICAL FAILURE for query "${query}":`);
+                    console.error(error);
+                    // If it's an API key or Model issue, we should stop everything, not just continue
+                    if (error.status === 403 || error.status === 404 || error.message?.includes("API key")) {
+                        throw new Error(`Stopping Radar: Critical API Error - ${error.message}`);
+                    }
                 }
 
                 // Small delay to be polite to APIs
