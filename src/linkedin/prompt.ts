@@ -22,12 +22,15 @@ Output valid JSON only with this schema:
   ]
 }
 Rules:
-1. Only include products if the post strongly indicates it is NEW (phrases like “new in”, “launching”, “now available”, “just landed”, “now stocked”, “listed”, “on shelves”).
-2. If the retailer is not clearly mentioned, retailer = null and products must be empty.
-3. Product name must be as written in the post. Do not invent.
-4. Categorize the product accurately based on its description. If unclear, use 'General'.
-5. If the post talks about a brand launch without naming a specific product, set product_name to the brand name + " (range)" and confidence Low.
-5. Extract the date the post was made or the product was spotted. If not clear, set to null.
-6. Extract the source URL (LinkedIn link) if it is visible or mentioned in the text context.
-7. Only include products mentioned/launched within the last 12 weeks. If the post describes an older launch (e.g., "last year"), ignore it.
+1. IDENTIFY NEWNESS: Look for any indication of a product listing, launch, or stock availability (e.g., "new in", "spotted at", "just bought", "finally at", "stockist", "on shelf").
+2. CONFIDENCE:
+   - "High": Explicit text like "launching today", "new at Tesco".
+   - "Medium": User posts like "Found this at Asda!", "Finally got my hands on X".
+   - "Low": Vague mentions, but still link a Product to a Retailer.
+   - DO NOT return empty if there is a *plausible* link. Err on the side of extraction.
+3. RETAILER: If the retailer is not named but strongly implied by the search context (e.g. "@Tesco"), infer it. If completely unknown, use null.
+4. DATE: If the date is missing or unclear, ASSUME IT IS RECENT (last 30 days) and include it. Do not filter out due to missing date.
+5. PRODUCT NAME: Extract the most specific product name possible.
+6. BRAND: Infer brand from the product name if needed.
+7. CRITICAL: Do not filter out results just because they don't explicitly say "Official Launch". We want to capture user spots and "shelfies" too.
 `;

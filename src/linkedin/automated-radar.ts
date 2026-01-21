@@ -69,7 +69,12 @@ async function runAutomatedRadar() {
                 ).join('\n');
 
                 try {
+                    // DEBUG: Log the input being sent to the LLM
+                    console.log(`[DEBUG] Sending ${combinedText.length} chars to LLM. Preview: ${combinedText.substring(0, 200)}...`);
+
                     const extraction = await extractor.extractFromText(combinedText);
+
+                    console.log(`[DEBUG] Extraction result for ${retailer}: ${extraction.products.length} products found.`);
 
                     if (extraction.products.length > 0) {
                         console.log(`✅ Found ${extraction.products.length} new products!`);
@@ -80,7 +85,7 @@ async function runAutomatedRadar() {
 
                         await exporter.appendExtraction(extraction, `AutoSearch (${scope.type}): ${query}`);
                     } else {
-                        console.log('No new products detected in these results.');
+                        console.log('No new products detected in these results (filtered by LLM).');
                     }
                 } catch (error) {
                     console.error(`Extraction failed for ${query}:`, error);
