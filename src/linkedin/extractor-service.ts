@@ -10,13 +10,13 @@ export class LinkedInExtractorService {
     constructor(apiKey: string) {
         this.genAI = new GoogleGenerativeAI(apiKey);
         this.model = this.genAI.getGenerativeModel({
-            model: "gemini-1.5-flash-latest",
+            model: "gemini-2.0-flash-exp",
             generationConfig: { responseMimeType: "application/json" }
         });
     }
 
     async extractFromText(postText: string): Promise<ExtractionResult> {
-        const prompt = `${LINKEDIN_EXTRACTION_SYSTEM_PROMPT}\n\nPost text:\n"""${postText}"""`;
+        const prompt = `${LINKEDIN_EXTRACTION_SYSTEM_PROMPT}\n\nUSER INSTRUCTION: You must extract EVERY product that even remotely looks like a new listing. Do not filter for "official" launches. If in doubt, extract it with confidence 'Low'.\n\nPost text:\n"""${postText}"""`;
 
         const result = await this.model.generateContent(prompt);
         const response = await result.response;
