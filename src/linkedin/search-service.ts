@@ -20,16 +20,21 @@ export class GoogleSearchService {
      * @param query The search query string
      * @param numResults Number of results to return (up to 100)
      */
-    async searchLinkedIn(query: string, numResults: number = 50, timeRange: string = 'qdr:m', siteFilter: string = 'site:linkedin.com/posts'): Promise<SearchResultSnippet[]> {
+    async searchLinkedIn(query: string, numResults: number = 50, timeRange?: string, siteFilter: string = 'site:linkedin.com/posts'): Promise<SearchResultSnippet[]> {
         // Construct query with specific site filter
         const fullQuery = `${siteFilter} ${query}`;
 
+        const payload: any = {
+            q: fullQuery,
+            num: numResults
+        };
+
+        if (timeRange) {
+            payload.tbs = timeRange;
+        }
+
         try {
-            const response = await axios.post('https://google.serper.dev/search', {
-                q: fullQuery,
-                num: numResults,
-                tbs: timeRange // Default to last month
-            }, {
+            const response = await axios.post('https://google.serper.dev/search', payload, {
                 headers: {
                     'X-API-KEY': this.apiKey,
                     'Content-Type': 'application/json'

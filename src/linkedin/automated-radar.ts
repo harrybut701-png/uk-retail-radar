@@ -64,6 +64,8 @@ async function runAutomatedRadar() {
                     continue;
                 }
 
+                console.log(`✅ Search Hit: Found ${searchResults.length} results. Processing with LLM...`);
+
                 // Combine snippets for batch extraction to save on LLM calls
                 const combinedText = searchResults.map(r =>
                     `SOURCE: ${r.link}\nDATE: ${r.date || 'unknown'}\nSNIPPET: ${r.snippet}\n---`
